@@ -1,21 +1,63 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
-const goalSchema = mongoose.Schema({
+const goalSchema = mongoose.Schema(
+  {
+    id: {
+      type: Number,
+      required: false,
+    },
     company: {
-        type: String,
-        required: [true, 'please add a text value']
+      type: String,
+      required: false,
     },
     logo: {
-        type: ImageData,
-        required: [true, 'please add a text value']
+      type: String,
+      required: false,
     },
-    email: {
-        type: String,
-        required: [true, 'please add a text value']
-    }
+    isnew: {
+      type: Boolean,
+      required: false,
+    },
+    featured: {
+      type: Boolean,
+      required: false,
+    },
+    position: {
+      type: String,
+      required: false,
+    },
+    role: {
+      type: String,
+      required: false,
+    },
+    level: {
+      type: String,
+      required: false,
+    },
+    postedAt: {
+      type: String,
+      required: false,
+    },
+    contract: {
+      type: String,
+      required: false,
+    },
+    location: {
+      type: String,
+      required: false,
+    },
+    languages: {
+      type: [String],
+      required: false,
+    },
+    tools: {
+      type: [String],
+      required: false,
+    },
+  },
+  {
+    timestamps: false,
+  }
+);
 
-}, {
-    timestamps: true
-})
-
-module.exports = mongoose.model('Goal', goalSchema)
+module.exports = mongoose.model('Goal', goalSchema);

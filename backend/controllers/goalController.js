@@ -15,14 +15,33 @@ const getGoals = asyncHandler(async(req, res) => {
 // @route POST /api/goals
 // @access private
 const setGoal = asyncHandler(async(req, res) => {
-    if(!req.body.text){
-        res.status(400)
-        throw new Error('please add a text field')
+    
+    const { company, logo, isnew, featured, position, role, level, postedAt, contract, location, languages, tools  } = req.body
+
+    if(!company){
+       return res.status(400).json({message: "add text"})
+
+        // throw new Error('plase add missing information')
     }
-    const goal = await Goal.create({
-        text: req.body.text,
-    })
-    res.status(200).json(goal)
+     else{
+
+        const goal = await Goal.create({
+            company,
+            logo,
+            isnew,
+            featured,
+            position,
+            role,
+            level,
+            postedAt,
+            contract,
+            location,
+            languages,
+            tools
+        })
+        return res.status(200).json(goal)
+     }
+
 })
 
 // @desc updating goals
@@ -34,8 +53,22 @@ const updateGoal =asyncHandler(async(req, res) => {
         res.status(400)
         throw new Error('goal not found')
     }
+    
+    goal.company = req.body.company || goal.company;
+    goal.logo = req.body.logo || goal.logo;
+    goal.isnew = req.body.isnew || goal.isnew;
+    goal.featured = req.body.featured || goal.featured;
+    goal.position = req.body.position || goal.position;
+    goal.role = req.body.role || goal.role;
+    goal.level = req.body.level || goal.level;
+    goal.postedAt = req.body.postedAt || goal.postedAt;
+    goal.contract = req.body.contract || goal.contract;
+    goal.location = req.body.location || goal.location;
+    goal.languages = req.body.languages || goal.languages;
+    goal.tools = req.body.tools || goal.tools;
+    
+    const updateGoal = await goal.save();
 
-    const updateGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {new: true,})
 
     res.status(200).json(updateGoal)
 })
@@ -49,7 +82,8 @@ const delateGoal = asyncHandler(async(req, res) => {
         res.status(400)
         throw new Error('goal not found')
     }
-        await goal.remove()
+    
+    await Goal.findByIdAndRemove(req.params.id);
     res.status(200).json({id: req.params.id})
 })
 
