@@ -8,13 +8,14 @@ const Job = require('../models/jobModel')
 
 const getJobs = asyncHandler(async(req, res) => {
     const page = req.query.p || 0;
-    const jobPerPage = 3;
-    const jobs = await Job.find()
+    const jobPerPage = 10;
+    const jobs = await Job.find({company: "job 1"}) // add filter criteria
     
+    .sort() //add sort criteria
     .skip(page * jobPerPage)
     .limit(jobPerPage)
 
-    res.status(200).json(jobs)
+    res.status(200).json({jobs, currentPage: page})
 })
 
 // @desc set jobs
