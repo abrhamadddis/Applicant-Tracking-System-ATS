@@ -5,8 +5,14 @@ const Job = require('../models/jobModel')
 // @desc Get jobs
 // @route GET  /api/jobs
 // @access private
+
 const getJobs = asyncHandler(async(req, res) => {
+    const page = req.query.p || 0;
+    const jobPerPage = 3;
     const jobs = await Job.find()
+    
+    .skip(page * jobPerPage)
+    .limit(jobPerPage)
 
     res.status(200).json(jobs)
 })
