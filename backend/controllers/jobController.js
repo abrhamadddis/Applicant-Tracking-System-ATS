@@ -39,13 +39,21 @@ const getJobs = asyncHandler(async(req, res) => {
         .limit(jobPerPage)
         res.status(200).json({jobs, currentPage: page, filterCriteria: filterCriteria})
     }
-     
-     
-    
-    
+})
 
+// @desc get job
+// @route POST /api/job
+// @route privee
 
-    // res.status(200).json({jobs, currentPage: page})
+const getJob = asyncHandler(async(req, res) => {
+    const job = await Job.findById(req.params.id)
+
+    if(!job) {
+        res.status(400)
+        throw new Error('job not found')
+    }
+    res.status(200).json(job) 
+
 })
 
 // @desc set jobs
@@ -126,5 +134,5 @@ const delateJob = asyncHandler(async(req, res) => {
 })
 
 module.exports = {
-    getJobs, setJob, updateJob, delateJob
+    getJobs, getJob, setJob, updateJob, delateJob
 }
