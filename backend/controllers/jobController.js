@@ -1,21 +1,51 @@
 const  asyncHandler = require('express-async-handler')
 
-const Job = require('../models/jobModel')
+const Job = require('../models/jobModel');
+const { query } = require('express');
 
 // @desc Get jobs
 // @route GET  /api/jobs
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    const page = req.query.p || 0;
-    const jobPerPage = 10;
-    const jobs = await Job.find({company: "job 1"}) // add filter criteria
-    
-    .sort() //add sort criteria
-    .skip(page * jobPerPage)
-    .limit(jobPerPage)
+    const page = req.query.p;
+    const filterCriteria = req.query.c;
+    const filterValue = req.query.cv
+    const jobPerPage = 3;
 
-    res.status(200).json({jobs, currentPage: page})
+
+    if(!page && !filterCriteria && !filterValue){
+        const jobs = await Job.find() 
+        res.status(200).json({jobs})
+    }else if(!page && filterCriteria && filterValue){
+        const query = {[filterCriteria]: filterValue};
+
+        const jobs = await Job.find(query)
+        res.status(200).json({jobs, filterCriteria: filterCriteria})
+    }
+    else if(page && !filterCriteria && !filterValue){
+        const jobs = await Job.find()
+        .sort()
+        .skip(page * jobPerPage)
+        .limit(jobPerPage)
+        
+        res.status(200).json({jobs,  currentPage: page})
+    }else{ 
+        const query = {[filterCriteria]: filterValue};
+        
+        const jobs = await Job.find(query)
+        .sort() 
+        .skip(page * jobPerPage)
+        .limit(jobPerPage)
+        res.status(200).json({jobs, currentPage: page, filterCriteria: filterCriteria})
+    }
+     
+     
+    
+    
+
+
+    // res.status(200).json({jobs, currentPage: page})
 })
 
 // @desc set jobs
