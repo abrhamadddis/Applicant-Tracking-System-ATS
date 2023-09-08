@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const goalSchema = mongoose.Schema(
+const jobSchema = mongoose.Schema(
   {
     id: {
       type: Number,
@@ -60,4 +60,4 @@ const goalSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Job', goalSchema);
+module.exports = mongoose.model('Job', jobSchema);
