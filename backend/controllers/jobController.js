@@ -2,6 +2,7 @@ const  asyncHandler = require('express-async-handler')
 
 const Job = require('../models/jobModel');
 const { query } = require('express');
+const moment  = require('moment')
 
 // @desc Get jobs
 // @route GET  /api/jobs
@@ -12,6 +13,7 @@ const getJobs = asyncHandler(async(req, res) => {
     const filterCriteria = req.query.c;
     const filterValue = req.query.cv
     const jobPerPage = 3;
+    
 
 
     if(!page && !filterCriteria && !filterValue){
@@ -47,6 +49,10 @@ const getJobs = asyncHandler(async(req, res) => {
 
 const getJob = asyncHandler(async(req, res) => {
     const job = await Job.findById(req.params.id)
+    const dateCreated = job.postedAt;
+    const formatPostedAt = moment(dateCreated).fromNow()
+    
+    job.postedAt = formatPostedAt
 
     if(!job) {
         res.status(400)
@@ -61,8 +67,9 @@ const getJob = asyncHandler(async(req, res) => {
 // @access private
 const setJob = asyncHandler(async(req, res) => {
     
-    const { company, logo, isnew, featured, position, role, level, postedAt, contract, location, languages, tools  } = req.body
-
+    const { company, logo, isnew, featured, position, role, level, contract, location, languages, tools  } = req.body
+    const postedAt = new Date();
+    
     if(!company){
        return res.status(400).json({message: "add text"})
 
@@ -78,7 +85,7 @@ const setJob = asyncHandler(async(req, res) => {
             position,
             role,
             level,
-            postedAt,
+            postedAt: postedAt,
             contract,
             location,
             languages,
