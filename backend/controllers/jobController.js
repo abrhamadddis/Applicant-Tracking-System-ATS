@@ -3,13 +3,14 @@ const  asyncHandler = require('express-async-handler')
 const Job = require('../models/jobModel');
 const { query } = require('express');
 const moment  = require('moment')
+const Joi = require('joi');
 
 // @desc Get jobs
 // @route GET  /api/jobs
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    const page = req.query.p;
+    const page = req.query.p || 0;
     const filterCriteria = req.query.c;
     const filterValue = req.query.cv
     const jobPerPage = 3;
@@ -65,36 +66,47 @@ const getJob = asyncHandler(async(req, res) => {
 // @desc set jobs
 // @route POST /api/jobs
 // @access private
-const setJob = asyncHandler(async(req, res) => {
-    
-    const { company, logo, isnew, featured, position, role, level, contract, location, languages, tools  } = req.body
+const setJob = asyncHandler(async (req, res) => {
+    const { company, logo, isnew, featured, position, role, level, contract, location, languages, tools } = req.body;
     const postedAt = new Date();
-    
-    if(!company){
-       return res.status(400).json({message: "add text"})
-
-        // throw new Error('plase add missing information')
+  
+    const jobValidationSchema = Joi.object({
+      company: Joi.string().required(),
+      logo: Joi.string(),
+      isnew: Joi.boolean(),
+      featured: Joi.boolean(),
+      position: Joi.string(),
+      role: Joi.string(),
+      level: Joi.string(),
+      contract: Joi.string(),
+      location: Joi.string(),
+      languages: Joi.array().items(Joi.string()),
+      tools: Joi.array().items(Joi.string()),
+    });
+  
+    try {
+      await jobValidationSchema.validateAsync(req.body);
+  
+      const job = await Job.create({
+        company,
+        logo,
+        isnew,
+        featured,
+        position,
+        role,
+        level,
+        postedAt,
+        contract,
+        location,
+        languages,
+        tools,
+      });
+  
+      return res.status(200).json(job);
+    } catch (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-     else{
-
-        const job = await Job.create({
-            company,
-            logo,
-            isnew,
-            featured,
-            position,
-            role,
-            level,
-            postedAt: postedAt,
-            contract,
-            location,
-            languages,
-            tools
-        })
-        return res.status(200).json(job)
-     }
-
-})
+  });
 
 // @desc updating jobs
 // @route PUT /api/jobs/id
