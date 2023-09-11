@@ -10,38 +10,43 @@ const Joi = require('joi');
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    const page = req.query.p || 0;
-    const filterCriteria = req.query.c;
-    const filterValue = req.query.cv
-    const jobPerPage = 3;
+    let {page, limit, company, position, location, sort} = req.query
+    limit = Number(limit)
+    page = Number(page)
+    const skip = (page - 1) * limit
+    const filterJob = {}
+    let query;
+
+
     
-
-
-    if(!page && !filterCriteria && !filterValue){
-        const jobs = await Job.find() 
-        res.status(200).json({jobs})
-    }else if(!page && filterCriteria && filterValue){
-        const query = {[filterCriteria]: filterValue};
-
-        const jobs = await Job.find(query)
-        res.status(200).json({jobs, filterCriteria: filterCriteria})
+    if(company){
+        filterJob.company = company;
+    } if(position){
+        filterJob.position = position;
+    } if(location) {
+        filterJob.location = location;
     }
-    else if(page && !filterCriteria && !filterValue){
-        const jobs = await Job.find()
-        .sort()
-        .skip(page * jobPerPage)
-        .limit(jobPerPage)
-        
-        res.status(200).json({jobs,  currentPage: page})
-    }else{ 
-        const query = {[filterCriteria]: filterValue};
-        
-        const jobs = await Job.find(query)
-        .sort() 
-        .skip(page * jobPerPage)
-        .limit(jobPerPage)
-        res.status(200).json({jobs, currentPage: page, filterCriteria: filterCriteria})
+
+    query = Job.find(filterJob)
+    console.log(query)
+    const dateCreated = query.postedAt;
+    const formatPostedAt = moment(dateCreated).fromNow()
+    query.postedAt = formatPostedAt
+
+
+    if(sort === "company"){
+        query.sort({company: 1});
+    } if(sort === "position") {
+        query.sort({position: 1});
+    } if (sort === "location"){
+        query.sort({location: 1});
     }
+    
+    const job = await query.skip(skip).limit(Number(limit));
+    let totalJobs = await Job.countDocuments(filterJob);
+    const totalPages = Math.ceil(totalJobs / limit)
+        
+        res.status(200).json({job, currentPage: page, totalPages: totalPages,})
 })
 
 // @desc get job
