@@ -51,20 +51,31 @@ const getJobs = asyncHandler(async(req, res) => {
 // @route POST /api/job
 // @route privee
 
-const getJob = asyncHandler(async(req, res) => {
-    const job = await Job.findById(req.params.id)
-    const dateCreated = job.postedAt;
-    const formatPostedAt = moment(dateCreated).fromNow()
+const getJob = asyncHandler(async (req, res) => {
+    const jobId = req.params.id;
+  
+    try {
+      const job = await Job.findById(jobId);
+  
+      if (!job) {
+        res.status(400);
+        throw new Error('Job not found');
+      }
+  
+      const dateCreated = job.postedAt;
+      const formatPostedAt = moment(dateCreated).fromNow();
+      job.postedAt = formatPostedAt;
+  
+      res.status(200).json(job);
+    } catch (error) {
+      if (error.name === 'CastError' && error.kind === 'ObjectId') {
+        res.status(400);
+        throw new Error('Invalid job ID');
+      }
+  
     
-    job.postedAt = formatPostedAt
-
-    if(!job) {
-        res.status(400)
-        throw new Error('job not found')
     }
-    res.status(200).json(job) 
-
-})
+  });
 
 // @desc set jobs
 // @route POST /api/jobs
