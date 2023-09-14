@@ -2,17 +2,13 @@ const mongoose = require('mongoose');
 
 const jobSchema = mongoose.Schema(
   {
-    id: {
-      type: Number,
-      required: false,
-    },
     company: {
       type: String,
       required: false,
     },
     logo: {
       type: String,
-      required: false,
+      required: true,
     },
     isnew: {
       type: Boolean,

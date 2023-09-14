@@ -10,12 +10,12 @@ const mongoose = require('mongoose')
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    let {page, limit, company, position, location, sort} = req.query
+    let {page, limit, company, position, location, sort, sortparam} = req.query
     limit = Number(limit)
     page = Number(page)
     const skip = (page - 1) * limit 
     const filterJob = {}
-    let query;
+    const sortJob = {}
 
     
     if(company){
@@ -26,17 +26,20 @@ const getJobs = asyncHandler(async(req, res) => {
         filterJob.location = location;
     }
 
-    query = Job.find(filterJob)
-
-    if(sort === "company"){
-        query.sort({company: 1});
-    } if(sort === "position") {
-        query.sort({position: 1});
-    } if (sort === "location"){
-        query.sort({location: 1});
-    }
+    const query = Job.find(filterJob)
     
-    const job = await query.skip(skip).limit(Number(limit));
+    if(sort === "company"){
+        sortJob.company = company;
+    } if(sort === "position") {
+        sortJob.position = position
+    } if (sort === "location"){
+        sortJob.location = location
+    }
+
+    sortedQuery = query.sort(sortJob)
+
+    
+    const job = await sortedQuery.skip(skip).limit(Number(limit));
     let totalJobs = await Job.countDocuments(filterJob);
     const totalPages = Math.ceil(totalJobs / limit)
         
@@ -111,7 +114,7 @@ const setJob = asyncHandler(async (req, res) => {
 // @desc updating jobs
 // @route PUT /api/jobs/id
 // @access private
-const updateJob =asyncHandler(async(req, res) => {
+const updateJob = asyncHandler(async(req, res) => {
   const jobId = req.params.id;
   
   if (!mongoose.Types.ObjectId.isValid(jobId)) {
@@ -125,23 +128,42 @@ const updateJob =asyncHandler(async(req, res) => {
         throw new Error('job not found')
     }
     
-    job.company = req.body.company || job.company;
-    job.logo = req.body.logo || job.logo;
-    job.isnew = req.body.isnew || job.isnew;
-    job.featured = req.body.featured || job.featured;
-    job.position = req.body.position || job.position;
-    job.role = req.body.role || job.role;
-    job.level = req.body.level || job.level;
-    job.postedAt = req.body.postedAt || job.postedAt;
-    job.contract = req.body.contract || job.contract;
-    job.location = req.body.location || job.location;
-    job.languages = req.body.languages || job.languages;
-    job.tools = req.body.tools || job.tools;
+    const jobValidationSchema = Joi.object({
+      company: Joi.string(),
+      logo: Joi.string(),
+      isnew: Joi.boolean(),
+      featured: Joi.boolean(),
+      position: Joi.string(),
+      role: Joi.string(),
+      level: Joi.string(),
+      contract: Joi.string(),
+      location: Joi.string(),
+      languages: Joi.array().items(Joi.string()),
+      tools: Joi.array().items(Joi.string()),
+    });
     
-    const updateGoal = await job.save();
+    try {
+      await jobValidationSchema.validateAsync(req.body);
 
+      job.company = req.body.company || job.company;
+      job.logo = req.body.logo || job.logo;
+      job.isnew = req.body.isnew || job.isnew;
+      job.featured = req.body.featured || job.featured;
+      job.position = req.body.position || job.position;
+      job.role = req.body.role || job.role;
+      job.level = req.body.level || job.level;
+      job.postedAt = req.body.postedAt || job.postedAt;
+      job.contract = req.body.contract || job.contract;
+      job.location = req.body.location || job.location;
+      job.languages = req.body.languages || job.languages;
+      job.tools = req.body.tools || job.tools;
 
-    res.status(200).json(updateGoal)
+      const updatedJob = await job.save();
+
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 })
 
 // @desc delate jobs
