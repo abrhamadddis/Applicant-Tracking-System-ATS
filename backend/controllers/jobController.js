@@ -11,9 +11,9 @@ const Joi = require('joi');
 
 const getJobs = asyncHandler(async(req, res) => {
     let {page, limit, company, position, location, sort} = req.query
-    limit = Number(limit)
-    page = Number(page)
-    const skip = (page - 1) * limit
+    limit = Number(limit) || 10
+    page = Number(page) || 1
+    const skip = (page - 1) * limit 
     const filterJob = {}
     let query;
 
@@ -28,7 +28,6 @@ const getJobs = asyncHandler(async(req, res) => {
     }
 
     query = Job.find(filterJob)
-    console.log(query)
     const dateCreated = query.postedAt;
     const formatPostedAt = moment(dateCreated).fromNow()
     query.postedAt = formatPostedAt
