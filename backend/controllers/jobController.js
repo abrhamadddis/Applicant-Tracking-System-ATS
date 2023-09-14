@@ -17,7 +17,6 @@ const getJobs = asyncHandler(async(req, res) => {
     const filterJob = {}
     let query;
 
-
     
     if(company){
         filterJob.company = company;
@@ -92,16 +91,16 @@ const setJob = asyncHandler(async (req, res) => {
       await jobValidationSchema.validateAsync(req.body);
   
       const job = await Job.create({
-        company,
+        company: company.toLowerCase(),
         logo,
         isnew,
         featured,
-        position,
+        position: position.toLowerCase(),
         role,
         level,
         postedAt,
         contract,
-        location,
+        location:location.toLowerCase(),
         languages,
         tools,
       });
