@@ -2,8 +2,8 @@ const  asyncHandler = require('express-async-handler')
 
 const Job = require('../models/jobModel');
 const { query } = require('express');
-const moment  = require('moment')
 const Joi = require('joi');
+const mongoose = require('mongoose')
 
 // @desc Get jobs
 // @route GET  /api/jobs
@@ -11,8 +11,8 @@ const Joi = require('joi');
 
 const getJobs = asyncHandler(async(req, res) => {
     let {page, limit, company, position, location, sort} = req.query
-    limit = Number(limit) || 10
-    page = Number(page) || 1
+    limit = Number(limit)
+    page = Number(page)
     const skip = (page - 1) * limit 
     const filterJob = {}
     let query;
@@ -27,10 +27,6 @@ const getJobs = asyncHandler(async(req, res) => {
     }
 
     query = Job.find(filterJob)
-    const dateCreated = query.postedAt;
-    const formatPostedAt = moment(dateCreated).fromNow()
-    query.postedAt = formatPostedAt
-
 
     if(sort === "company"){
         query.sort({company: 1});
@@ -52,30 +48,20 @@ const getJobs = asyncHandler(async(req, res) => {
 // @route privee
 
 const getJob = asyncHandler(async (req, res) => {
-    const jobId = req.params.id;
+  const jobId = req.params.id;
   
-    try {
-      const job = await Job.findById(jobId);
-  
-      if (!job) {
-        res.status(400);
-        throw new Error('Job not found');
-      }
-  
-      const dateCreated = job.postedAt;
-      const formatPostedAt = moment(dateCreated).fromNow();
-      job.postedAt = formatPostedAt;
-  
-      res.status(200).json(job);
-    } catch (error) {
-      if (error.name === 'CastError' && error.kind === 'ObjectId') {
-        res.status(400);
-        throw new Error('Invalid job ID');
-      }
-  
-    
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+
+      return res.status(400).json({ message: "Invalid Job ID" });
+
     }
-  });
+    
+    const job = await Job.findById(jobId);
+    if (!job)
+      return res.status(404).send("the job with the given id was not found.")
+  
+    res.status(200).json(job);
+});
 
 // @desc set jobs
 // @route POST /api/jobs
@@ -102,16 +88,16 @@ const setJob = asyncHandler(async (req, res) => {
       await jobValidationSchema.validateAsync(req.body);
   
       const job = await Job.create({
-        company: company.toLowerCase(),
+        company,
         logo,
         isnew,
         featured,
-        position: position.toLowerCase(),
+        position,
         role,
         level,
         postedAt,
         contract,
-        location:location.toLowerCase(),
+        location,
         languages,
         tools,
       });
@@ -126,7 +112,14 @@ const setJob = asyncHandler(async (req, res) => {
 // @route PUT /api/jobs/id
 // @access private
 const updateJob =asyncHandler(async(req, res) => {
-    const job = await Job.findById(req.params.id)
+  const jobId = req.params.id;
+  
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+
+      return res.status(400).json({ message: "Invalid Job ID" });
+
+    }
+    const job = await Job.findById(jobId)
     if(!job) {
         res.status(400)
         throw new Error('job not found')
@@ -155,13 +148,19 @@ const updateJob =asyncHandler(async(req, res) => {
 // @route delate /api/jobs/id
 // @access private
 const delateJob = asyncHandler(async(req, res) => {
-    const job = await Job.findById(req.params.id)
+    const jobId = req.params.id
+    if (!mongoose.Types.ObjectId.isValid(jobId)) {
+
+      return res.status(400).json({ message: "Invalid Job ID" });
+
+    }
+    const job = await Job.findById(jobId)
     if(!job) {
         res.status(400)
         throw new Error('job not found')
     }
     
-    await Job.findByIdAndRemove(req.params.id);
+    await Job.findByIdAndRemove(jobId);
 
     res.status(200).json({id: req.params.id})
 })
