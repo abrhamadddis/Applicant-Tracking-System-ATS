@@ -1,18 +1,14 @@
 const mongoose = require('mongoose');
 
-const goalSchema = mongoose.Schema(
+const jobSchema = mongoose.Schema(
   {
-    id: {
-      type: Number,
-      required: false,
-    },
     company: {
       type: String,
       required: false,
     },
     logo: {
       type: String,
-      required: false,
+      required: true,
     },
     isnew: {
       type: Boolean,
@@ -60,4 +56,4 @@ const goalSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Goal', goalSchema);
+module.exports = mongoose.model('Job', jobSchema);
