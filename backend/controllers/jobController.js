@@ -10,9 +10,9 @@ const mongoose = require('mongoose')
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    let {page, limit, company, position, location, sort, sortparam} = req.query
-    limit = Number(limit)
-    page = Number(page)
+    let {page, limit, company, position, location, sort,} = req.query
+    limit = Number(limit) || 2
+    page = Number(page) || 4
     const skip = (page - 1) * limit 
     const filterJob = {}
     const sortJob = {}
