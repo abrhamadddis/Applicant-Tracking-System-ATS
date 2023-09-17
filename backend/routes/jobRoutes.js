@@ -4,7 +4,7 @@ const {getJobs,getJob, setJob, updateJob, delateJob} = require('../controllers/j
 
 const {protect} = require('../middleware/authMiddleware')
 
-router.route('/').get(protect, getJobs).post(setJob)
+router.route('/').get(protect, getJobs).post(protect, setJob)
 
 router.route('/:id').put(protect, updateJob).delete( protect, delateJob).get(protect, getJob)
 

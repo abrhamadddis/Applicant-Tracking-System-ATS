@@ -11,21 +11,23 @@ const mongoose = require('mongoose')
 
 const getJobs = asyncHandler(async(req, res) => {
     let {page, limit, company, position, location, sort,} = req.query
-    limit = Number(limit) || 2
-    page = Number(page) || 4
+    limit = Number(limit) || 1
+    page = Number(page) || 1
     const skip = (page - 1) * limit 
     const filterJob = {}
     const sortJob = {}
 
-    
-    if(company){
+    if(req.user){
+        filterJob.user = req.user.id
+    }if(company){
         filterJob.company = company;
     } if(position){
         filterJob.position = position;
     } if(location) {
         filterJob.location = location;
     }
-
+    
+    console.log(filterJob)
     const query = Job.find(filterJob)
     
     if(sort === "company"){
@@ -91,6 +93,7 @@ const setJob = asyncHandler(async (req, res) => {
       await jobValidationSchema.validateAsync(req.body);
   
       const job = await Job.create({
+        user: req.user.id,
         company,
         logo,
         isnew,
@@ -107,7 +110,7 @@ const setJob = asyncHandler(async (req, res) => {
   
       return res.status(200).json(job);
     } catch (error) {
-      return res.status(400).json({ message: error.details[0].message });
+      return res.status(400).json({ message: "error found " });
     }
   });
 
