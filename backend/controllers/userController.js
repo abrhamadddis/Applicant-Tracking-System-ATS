@@ -2,13 +2,14 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
+const { default: mongoose } = require('mongoose')
 
 
 // @desc Register new user
 // @Route POST /api/users
 // @access public
 
-const regusterUser = asyncHandler(async(req, res) => {
+const registerUser = asyncHandler(async(req, res) => {
     const { name, email, password, role} = req.body
 
     if (!name, !email, !password, !role){
@@ -52,9 +53,61 @@ const regusterUser = asyncHandler(async(req, res) => {
     
 })
 
+// @desc updating a user
+// @route GET /api/users/id
+// @access private
+
+const updateUser = asyncHandler(async(req, res) =>{
+    const userId = req.params.id;
+
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(400).json({message: "Invalid user ID"})
+    }
+    const user = await User.findById(userId)
+    if(!user){
+        res.status(400)
+        throw new Error('user is not found')
+    }
+    
+    user.name = req.body.name || user.name;
+    user.email= req.body.email || user.email;
+
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+
+    user.password = hashedPassword || user.password
+    user.role = req.body.role || user.role
+
+    const updatedUser = await user.save();
+
+
+    res.status(200).json(updatedUser)
+})
+
+// @desc delate a user
+// @Route DELETE /api/users/:id
+// @access private
+
+const delateUser = asyncHandler(async(req, res)=>{
+    const userId = req.params.id
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(400).json({message: "Invalid user Id"})
+    }
+    
+    const user = await User.findById(userId)
+    if(!user) {
+        res.status(400)
+        throw new Error('user nor found')
+    }
+
+    await User.findByIdAndRemove(userId);
+
+    res.status(200).json({id: req.params.id})
+})
+
 // @desc Authenticte a user
 // @Route POST /api/users/login
-// @access public
+// @access private
 
 const loginUser = asyncHandler(async(req, res) => {
     const { email, password} = req.body
@@ -75,6 +128,8 @@ const loginUser = asyncHandler(async(req, res) => {
     }
     
 })
+
+//
 
 // @desc Get user data
 // @Route POST /api/users/me
@@ -97,7 +152,9 @@ const generateToken = (id, role) => {
 }
 
 module.exports = {
-    regusterUser,
+    registerUser,
     loginUser,
+    updateUser,
+    delateUser,
     getMe,
 }

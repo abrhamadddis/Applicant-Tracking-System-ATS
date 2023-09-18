@@ -10,7 +10,8 @@ const mongoose = require('mongoose')
 // @access private
 
 const getJobs = asyncHandler(async(req, res) => {
-    let {page, limit, company, position, location, sort,} = req.query
+    let {page, limit, company, position, location, sort} = req.query
+    console.log(req.query)
     limit = Number(limit)
     page = Number(page)
     const skip = (page - 1) * limit 
@@ -39,7 +40,7 @@ const getJobs = asyncHandler(async(req, res) => {
         sortJob.location = location
     }
 
-    sortedQuery = query.sort(sortJob)
+    sortedQuery = query.collation({locale: 'en', strength: 2}).sort(sortJob)
 
     
     const job = await sortedQuery.skip(skip).limit(Number(limit));
@@ -177,7 +178,7 @@ const delateJob = asyncHandler(async(req, res) => {
     const jobId = req.params.id
     if (!mongoose.Types.ObjectId.isValid(jobId)) {
 
-      return res.status(400).json({ message: "Invalid Job ID" });
+      return res.status(400).json({ message: "Invalid Job Id" });
 
     }
     const job = await Job.findById(jobId)

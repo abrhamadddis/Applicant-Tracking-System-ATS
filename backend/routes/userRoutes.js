@@ -1,11 +1,17 @@
 const express = require('express')
 const router = express.Router()
-const {regusterUser, loginUser, getMe} = require('../controllers/userController')
+const {registerUser, loginUser, updateUser, delateUser, getMe} = require('../controllers/userController')
 
-const {protect} = require('../middleware/authMiddleware')
+const {protectSupperAdmin} = require('../middleware/authMiddleware')
 
-router.post('/', regusterUser)
-router.post('/login', loginUser)
-router.get('/me', protect, getMe)
+router.route('/').post(protectSupperAdmin, registerUser)
+
+router.route('/login').post(loginUser)
+
+router.route('/:id').put(protectSupperAdmin, updateUser).delete(protectSupperAdmin, delateUser)
+
+router.route('/me').get(getMe)
+
+
 
 module.exports = router
