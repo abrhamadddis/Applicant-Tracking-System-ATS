@@ -11,15 +11,16 @@ const mongoose = require('mongoose')
 
 const getJobs = asyncHandler(async(req, res) => {
     let {page, limit, company, position, location, sort,} = req.query
-    limit = Number(limit) || 1
-    page = Number(page) || 1
+    limit = Number(limit)
+    page = Number(page)
     const skip = (page - 1) * limit 
     const filterJob = {}
     const sortJob = {}
 
-    if(req.user){
-        filterJob.user = req.user.id
-    }if(company){
+    // // if(req.user){
+    // //     filterJob.user = req.user.id
+    // }
+    if(company){
         filterJob.company = company;
     } if(position){
         filterJob.position = position;

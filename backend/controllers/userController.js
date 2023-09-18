@@ -9,9 +9,9 @@ const User = require('../models/userModel')
 // @access public
 
 const regusterUser = asyncHandler(async(req, res) => {
-    const { name, email, password} = req.body
+    const { name, email, password, role} = req.body
 
-    if (!name, !email, !password){
+    if (!name, !email, !password, !role){
         res.status(400)
         throw new Error('please add all the fields')
     }
@@ -32,7 +32,8 @@ const regusterUser = asyncHandler(async(req, res) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        role
     })
 
     if(user) {
@@ -40,7 +41,8 @@ const regusterUser = asyncHandler(async(req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
-            token: generateToken(user.id)
+            token: generateToken(user.id, user.role),
+            role
         })
     }else{
         res.status(400)
@@ -65,7 +67,7 @@ const loginUser = asyncHandler(async(req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
-            token: generateToken(user.id)
+            token: generateToken(user.id, user.role)
         })
     } else{
         res.status(400)
@@ -90,8 +92,8 @@ const getMe = asyncHandler(async(req, res) => {
 
 // Generate JWT
 
-const generateToken = (id) => {
-    return jwt.sign( { id }, process.env.JWT_SECRET, {expiresIn: '30d',})
+const generateToken = (id, role) => {
+    return jwt.sign( { id, role }, process.env.JWT_SECRET, {expiresIn: '30d',})
 }
 
 module.exports = {
