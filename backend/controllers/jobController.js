@@ -11,7 +11,6 @@ const mongoose = require('mongoose')
 
 const getJobs = asyncHandler(async(req, res) => {
     let {page, limit, company, position, location, sort} = req.query
-    console.log(req.query)
     limit = Number(limit)
     page = Number(page)
     const skip = (page - 1) * limit 
@@ -121,6 +120,7 @@ const setJob = asyncHandler(async (req, res) => {
 // @access private
 const updateJob = asyncHandler(async(req, res) => {
   const jobId = req.params.id;
+  // console.log(req.user.id)
   
   if (!mongoose.Types.ObjectId.isValid(jobId)) {
 
@@ -132,7 +132,12 @@ const updateJob = asyncHandler(async(req, res) => {
         res.status(400)
         throw new Error('job not found')
     }
-    
+    if (job.user.toString() !== req.user.id){
+        res.status(401)
+        throw new Error('Not authorized')
+    }
+
+    console.log(job.user._id)
     const jobValidationSchema = Joi.object({
       company: Joi.string(),
       logo: Joi.string(),
@@ -186,6 +191,10 @@ const delateJob = asyncHandler(async(req, res) => {
         res.status(400)
         throw new Error('job not found')
     }
+    if (job.user.toString() !== req.user.id){
+      res.status(401)
+      throw new Error('Not authorized')
+  }
     
     await Job.findByIdAndRemove(jobId);
 
