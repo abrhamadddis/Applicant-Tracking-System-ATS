@@ -17,9 +17,6 @@ const getJobs = asyncHandler(async(req, res) => {
     const filterJob = {}
     const sortJob = {}
 
-    // // if(req.user){
-    // //     filterJob.user = req.user.id
-    // }
     if(company){
         filterJob.company = company;
     } if(position){
@@ -28,7 +25,6 @@ const getJobs = asyncHandler(async(req, res) => {
         filterJob.location = location;
     }
     
-    console.log(filterJob)
     const query = Job.find(filterJob)
     
     if(sort === "company"){
@@ -46,7 +42,7 @@ const getJobs = asyncHandler(async(req, res) => {
     let totalJobs = await Job.countDocuments(filterJob);
     const totalPages = Math.ceil(totalJobs / limit)
         
-        res.status(200).json({job, currentPage: page, totalPages: totalPages,})
+        res.status(200).json({job, currentPage: page, totalPages: totalPages})
 })
 
 // @desc get job

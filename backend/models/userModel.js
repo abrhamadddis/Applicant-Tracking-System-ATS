@@ -20,6 +20,13 @@ const userSchema = mongoose.Schema({
         enum: ['candidate', 'admin', 'superAdmin'],
         default: 'candidate'
 
+    },
+    status: {
+        type: String,
+        required: [true, 'please add a status'],
+        enum: ['active', 'inactive'],
+        default: 'active'
+
     }
 
 },

@@ -10,9 +10,9 @@ const { default: mongoose } = require('mongoose')
 // @access public
 
 const registerUser = asyncHandler(async(req, res) => {
-    const { name, email, password, role} = req.body
+    const { name, email, password, role, status} = req.body
 
-    if (!name, !email, !password, !role){
+    if (!name, !email, !password, !role, !status){
         res.status(400)
         throw new Error('please add all the fields')
     }
@@ -34,7 +34,8 @@ const registerUser = asyncHandler(async(req, res) => {
         name,
         email,
         password: hashedPassword,
-        role
+        role,
+        status
     })
 
     if(user) {
@@ -43,7 +44,8 @@ const registerUser = asyncHandler(async(req, res) => {
             name: user.name,
             email: user.email,
             token: generateToken(user.id, user.role),
-            role
+            role,
+            status
         })
     }else{
         res.status(400)
@@ -77,11 +79,13 @@ const updateUser = asyncHandler(async(req, res) =>{
 
     user.password = hashedPassword || user.password
     user.role = req.body.role || user.role
+    user.status= req.body.status || user.status
 
-    const updatedUser = await user.save();
+    const updatedUser = await user.save().select;
+    const {password, ...updatedWithOutPassWord} = updatedUser
 
 
-    res.status(200).json(updatedUser)
+    res.status(200).json(updatedWithOutPassWord)
 })
 
 // @desc delate a user
@@ -105,6 +109,59 @@ const delateUser = asyncHandler(async(req, res)=>{
     res.status(200).json({id: req.params.id})
 })
 
+
+// @desc get a users
+// @Route Get /api/users
+// @access private
+
+const getUsers = asyncHandler(async(req, res)=> {
+    let {page, limit, role, sort} = req.query
+    limit = Number(limit) || 2
+    page = Number(page) || 1
+    const skip = (page - 1) * limit 
+    const filteredUser = {}
+    const sortUser = {}
+
+    if(role){
+        filteredUser.role = role;
+    }
+
+    const query = User.find(filteredUser).select("-password")
+
+    if(sort === "name"){
+        sortUser.name = name
+    }
+
+    sortedQuery = query.sort(sortUser)
+
+    const user = await sortedQuery.skip(skip).limit(Number(limit));
+    let totalUsers = await  User.countDocuments(filteredUser);
+    const totalPages = Math.ceil(totalUsers / limit)
+
+    res.status(200).json({user, currentPage: page, totalPages: totalPages})
+})
+
+// @desc get a user by id 
+// @route Get /api/user/:id
+// @route private
+
+const getUser = asyncHandler (async(req, res) => {
+    const userId = req.params.id;
+
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+        return res.status(400).json({message: "Invalid user ID"});
+    }
+    const user = await User.findById(userId).select("-password");
+
+    if(!user) {
+        return res.status(404).send("the user with the given id was not found")
+
+    }
+    res.status(200).json(user)
+})
+
+
+
 // @desc Authenticte a user
 // @Route POST /api/users/login
 // @access private
@@ -116,6 +173,10 @@ const loginUser = asyncHandler(async(req, res) => {
     const user = await User.findOne({email})
 
     if(user && (await bcrypt.compare(password, user.password))){
+        if(user.status === "inactive"){
+            res.status(401)
+            throw new Error('you are account is inactive ') 
+        }
         res.json({
             _id: user.id,
             name: user.name,
@@ -136,12 +197,14 @@ const loginUser = asyncHandler(async(req, res) => {
 // @access private
 
 const getMe = asyncHandler(async(req, res) => {
-    const { _id, name, email} = await User.findById(req.user.id)
+    const { _id, name, email, role, status} = await User.findById(req.user.id)
 
     res.status(200).json({
         id: _id,
         name,
         email,
+        role,
+        status
     })
 })
 
@@ -154,6 +217,8 @@ const generateToken = (id, role) => {
 module.exports = {
     registerUser,
     loginUser,
+    getUsers,
+    getUser,
     updateUser,
     delateUser,
     getMe,

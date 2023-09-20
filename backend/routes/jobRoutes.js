@@ -1,13 +1,24 @@
-const express = require('express')
-const router = express.Router()
-const {getJobs,getJob, setJob, updateJob, delateJob} = require('../controllers/jobController')
+const express = require("express");
+const router = express.Router();
+const {
+  registerUser,
+  getUsers,
+  updateUser,
+  delateUser,
+  getUser,
+} = require("../controllers/userController");
 
-const {protectAdmin} = require('../middleware/authMiddleware')
+const { protectSupperAdmin } = require("../middleware/authMiddleware");
 
-router.route('/').get(getJobs).post(protectAdmin, setJob)
+router
+  .route("/")
+  .post(protectSupperAdmin, registerUser)
+  .get(protectSupperAdmin, getUsers);
 
-router.route('/:id').put(protectAdmin, updateJob).delete( protectAdmin, delateJob).get(getJob)
+router
+  .route("/:id")
+  .put(protectSupperAdmin, updateUser)
+  .delete(protectSupperAdmin, delateUser)
+  .get(protectSupperAdmin, getUser);
 
-
-
-module.exports = router
+module.exports = router;
