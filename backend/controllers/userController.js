@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
+const Joi = require('joi');
 const { default: mongoose } = require('mongoose')
 
 
@@ -81,8 +82,9 @@ const updateUser = asyncHandler(async(req, res) =>{
     user.role = req.body.role || user.role
     user.status= req.body.status || user.status
 
-    const updatedUser = await user.save().select;
-    const {password, ...updatedWithOutPassWord} = updatedUser
+    const updatedUser = await user.save();
+    console.log(updatedUser)
+    const {password, ...updatedWithOutPassWord} = updatedUser.toObject()
 
 
     res.status(200).json(updatedWithOutPassWord)
