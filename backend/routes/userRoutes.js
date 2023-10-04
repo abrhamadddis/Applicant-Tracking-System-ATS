@@ -8,7 +8,9 @@ const {
   getUser,
 } = require("../controllers/userController");
 
-const { protectSupperAdmin } = require("../middleware/authMiddleware");
+const {
+  protectSupperAdmin,
+} = require("../middleware/authMiddleware");
 
 router
   .route("/")
