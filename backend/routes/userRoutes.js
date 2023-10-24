@@ -14,13 +14,13 @@ const {
 
 router
   .route("/")
-  .post(protectSupperAdmin, registerUser)
-  .get(protectSupperAdmin, getUsers);
+  .post( registerUser)
+  .get( getUsers);
 
 router
   .route("/:id")
-  .put(protectSupperAdmin, updateUser)
-  .delete(protectSupperAdmin, delateUser)
-  .get(protectSupperAdmin, getUser);
+  .put( updateUser)
+  .delete( delateUser)
+  .get( getUser);
 
 module.exports = router;
