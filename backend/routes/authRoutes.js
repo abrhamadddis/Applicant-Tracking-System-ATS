@@ -8,7 +8,7 @@ router.route('/').post(protectSupperAdmin, registerUser)
 
 router.route('/login').post(loginUser)
 
-router.route('/me').get(protectMe, getMe)
+router.route('/me').get(getMe)
 
 
 

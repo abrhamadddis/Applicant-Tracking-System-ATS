@@ -14,8 +14,8 @@ const {
 
 router
   .route("/")
-  .post( registerUser)
-  .get( getUsers);
+  .post( protectSupperAdmin, registerUser)
+  .get(protectSupperAdmin, getUsers);
 
 router
   .route("/:id")
