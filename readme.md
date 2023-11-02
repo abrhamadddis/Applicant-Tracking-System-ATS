@@ -2,6 +2,8 @@
 
 The Applicant Tracking System (ATS) is a full stack web application designed to streamline the hiring process and manage job applications efficiently.
 
+![job listing page img](path/to/frontEnd/src/assets/Joblisting-page.PNG)
+
 ## Table of Contents
 - [Overview](#overview)
 - [Installation](#installation)
@@ -10,10 +12,7 @@ The Applicant Tracking System (ATS) is a full stack web application designed to 
 - [Technologies Used](#technologies-used)
 - [Usage and Examples](#usage-and-examples)
 - [Database Setup](#database-setup)
-- [Deployment](#deployment)
-- [Testing](#testing)
 - [Contribution Guidelines](#contribution-guidelines)
-- [License](#license)
 - [Contact Information](#contact-information)
 
 ## Overview
@@ -29,10 +28,10 @@ The ATS system provides a user-friendly interface for managing job postings, rev
    - Add the necessary environment variables, such as database connection details, authentication secrets, and email settings.
 
 ## Project Structure
-- `/src`: Contains the source code files for both the front-end and back-end.
-- `/src/client`: Front-end code and assets.
-- `/src/server`: Back-end code and API endpoints.
-- `/public`: Static files for the front-end.
+- `/BackEnd`: Contains the source code files for back-end.
+- `/FrontEnd`: Contains the source code files for Front-end.
+- `/FrontEnd/src/`: Front-end code and assets.
+- `/BackEnd/src/server`: Back-end code and API endpoints.
 
 ## Technologies Used
 - Front-end: Vue, Pinia, tailwind Css
@@ -40,29 +39,20 @@ The ATS system provides a user-friendly interface for managing job postings, rev
 - Database: MongoDB
 - Authentication: JSON Web Tokens (JWT)
 
-## Usage and Examples
-1. Start the development server: `npm run dev`
-2. Open your browser and navigate to [http://localhost:3000](http://localhost:3000) to access the application.
-3. [Include any specific instructions or examples on how to use the application or its features, such as creating a job posting, reviewing applications, or managing candidate profiles.]
+## Usage
+1. Start the backend server: `npm run server`
+2. Start the frontend serer: `npm run dev`
+3. Open your browser and navigate to [http://localhost:3000](http://localhost:3000) to access the application.
 
 ## Database Setup
 1. Ensure MongoDB is installed and running.
 2. [Provide instructions on how to set up and configure the database, including any required collections or indexes.]
 
-## Deployment
-1. [Provide instructions on how to deploy the application to a production environment, including any necessary build steps or deployment configurations.]
-
-## Testing
-1. Run tests: `npm run test`
-2. [Include any additional instructions on running tests or specific testing frameworks used.]
 
 ## Contribution Guidelines
 1. Fork the repository and create a new branch for your contributions.
 2. Make your changes and submit a pull request.
 3. [Include any guidelines or instructions for contributing, such as code style, issue trackers, or feature request processes.]
 
-## License
-This project is licensed under the [License Name]. [Include any additional license information or links to the full license file.]
-
 ## Contact Information
-For any questions or feedback, please contact [Your Name] at [your-email@example.com].
+For any questions or feedback, please contact [Abrham Adddis] at [abrhamaddis32@gmail.com].
