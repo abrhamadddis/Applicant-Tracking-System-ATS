@@ -3,7 +3,7 @@
 The Applicant Tracking System (ATS) is a full stack web application designed to streamline the hiring process and manage job applications efficiently.
 
 ![job listing page img](FrontEnd/src/assets/Joblisting-page.PNG)
-![login page img](FrontEnd/src/assets/login.PNG) ![login page img](FrontEnd/src/assets/Filter.jpg)
+![login page img](FrontEnd/src/assets/login.PNG)
 ## Table of Contents
 - [Overview](#overview)
 - [Installation](#installation)
